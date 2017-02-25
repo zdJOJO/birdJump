@@ -6,6 +6,7 @@ import App from '../views/App';
 import Home from '../views/Home';
 import Login from '../views/Login';
 import Page2 from '../views/Page2';
+import Page3 from '../views/Page3/index';
 
 import {getCookie} from '../utils';
 
@@ -23,6 +24,7 @@ const routes = (
       <Route component={App}>
           <Route path="home" component={Home}/>
           <Route path="page2" component={Page2}/>
+          <Route path="page3" component={Page3}/>
       </Route>
       <Route path="login" component={Login}/>
   </Route>

@@ -29,7 +29,8 @@
     "react-router": "^2.0.0",
     "redux": "^3.6.0",
     "redux-thunk": "^2.1.0",
-    "superagent": "^2.3.0"
+    "superagent": "^2.3.0",
+    "uxcore": "^0.7.5"
   },
   "devDependencies": {
     "babel-core": "^6.17.0",

@@ -15,10 +15,6 @@ module.exports = [
       {
         name: '选项3',
         key: 103
-      },
-      {
-        name: '选项4',
-        key: 104
       }
     ]
   },

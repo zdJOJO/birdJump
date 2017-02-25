@@ -50,7 +50,8 @@ class Sidebar extends React.Component {
           key={'sub'+item.key}
           title={<span><Icon type={item.icon} />{item.name}</span>}
         >
-          {item.child.map((node) => {
+          {
+            item.child.map((node) => {
             if(node.url && router.isActive(node.url, true)){
               activeKey = 'menu'+node.key
             }

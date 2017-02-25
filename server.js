@@ -81,11 +81,8 @@ app.post('/api/menu', function(req, res) {
           },
           {
             name: '选项3',
-            key: 103
-          },
-          {
-            name: '选项4',
-            key: 104
+            key: 103,
+            url: '/page3'
           }
         ]
       },

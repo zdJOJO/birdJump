@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 
 import { Row, Col, Card, Table} from 'antd';
 
+
 import {fetchInfo} from '../../actions/list'
 
 import './index.less'
@@ -38,16 +39,33 @@ const columns = [{
 }];
 
 class Page2 extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+        }
+    }
 
     componentDidMount () {
         const {fetchInfo} = this.props;
         fetchInfo(0)
     }
 
+
+    handleKeyUp(e, editor) {
+        console.log(editor.getContent());
+    }
+
+    handleChange(e, editor) {
+        console.log(editor.getContent());
+    }
+
   render () {
+      let me = this;
       const {commentList} = this.props;
           return (
-              <Table columns={columns} dataSource={commentList} rowKey={record => record.id}/>
+              <div>
+                  <Table columns={columns} dataSource={commentList} rowKey={record => record.id}/>
+              </div>
           )
   }
 }

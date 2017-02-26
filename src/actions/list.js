@@ -9,7 +9,6 @@ export const GET_COMMENT_LIST_SUCCESS = 'GET_COMMENT_LIST_SUCCESS';
 
 //成功获取list
 const getListSuccess = list =>{
-    console.log(3333333)
     return{
         type: GET_COMMENT_LIST_SUCCESS,
         list
@@ -24,7 +23,6 @@ const getList = ()=>{
                 return res.json()
             })
             .then( json =>{
-                console.log(json.data.list)
                 dispatch(getListSuccess(json.data.list))
             })
             .catch( e=>{

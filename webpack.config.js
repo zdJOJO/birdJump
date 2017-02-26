@@ -7,49 +7,50 @@ var distPath = path.join(__dirname, 'dist');
 module.exports = {
   devtool: 'eval-source-map',
   entry: [
-    './src/index'
+      './src/index'
   ],
   output: {
-    path: distPath,
-    filename: 'bundle.js',
-    publicPath: '/'
+      path: distPath,
+      filename: 'bundle.js',
+      publicPath: '/'
   },
   plugins: [
-    new HtmlWebpackPlugin({
-      template: __dirname + '/index.tpl'
-    })
+      new HtmlWebpackPlugin({
+          template: __dirname + '/index.html'
+      })
   ],
   resolve: {
-    extensions: ['', '.js', '.jsx']
+      extensions: ['', '.js', '.jsx']
   },
   module: {
-    loaders: [
-      {
-        test: /\.js$/,
-        loaders: ['babel'],
-        exclude: /node_modules/,
-        include: __dirname
-      },
-      {
-        test: /\.css?$/,
-        loaders : [
-          'style-loader',
-          'css-loader'
-        ]
-      },
-      {
-        test: /\.less?$/,
-        loaders : [
-          'style-loader',
-          'css-loader',
-          'less-loader?{"sourceMap":true}'
-        ],
-        include: __dirname
-      },
-      { test: /\.(jpe?g|png|gif|svg)$/,
-        loader: 'url',
-        query: {limit: 10240}
-      }
-    ]
+      loaders: [
+          {
+              test: /\.js$/,
+              loaders: ['babel'],
+              exclude: /node_modules/,
+              include: __dirname
+          },
+          {
+              test: /\.css?$/,
+              loaders : [
+                  'style-loader',
+                  'css-loader'
+              ]
+          },
+          {
+              test: /\.less?$/,
+              loaders : [
+                  'style-loader',
+                  'css-loader',
+                  'less-loader?{"sourceMap":true}'
+              ],
+              include: __dirname
+          },
+          { test: /\.(jpe?g|png|gif|svg)$/,
+              loader: 'url',
+              query: {limit: 10240}
+          }
+      ]
   }
+
 };

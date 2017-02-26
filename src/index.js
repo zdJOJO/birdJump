@@ -9,24 +9,24 @@ import Root from './containers/Root';
 const store = configureStore();
 
 render(
-  <AppContainer>
-    <Root
-      store={ store }
-    />
-  </AppContainer>,
-  document.getElementById('root')
+    <AppContainer>
+        <Root
+            store={ store }
+        />
+    </AppContainer>,
+    document.getElementById('root')
 );
 
 if (module.hot) {
-  module.hot.accept('./containers/Root', () => {
-    const RootContainer = require('./containers/Root');
-    render(
-      <AppContainer>
-        <RootContainer
-          store={ store }
-        />
-      </AppContainer>,
-      document.getElementById('root')
-    );
-  });
+    module.hot.accept('./containers/Root', () => {
+        const RootContainer = require('./containers/Root');
+        render(
+            <AppContainer>
+                <RootContainer
+                    store={ store }
+                />
+            </AppContainer>,
+            document.getElementById('root')
+        );
+    });
 }

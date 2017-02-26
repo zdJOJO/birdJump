@@ -8,9 +8,9 @@ import Login from '../views/Login';
 import Page2 from '../views/Page2';
 import Page3 from '../views/Page3/index';
 
-import {getCookie} from '../utils';
+import {getCookie} from '../utils/index';
 
-const validate = function (next, replace, callback) {
+const validate = (next, replace, callback) => {
   const isLoggedIn = !!getCookie('uid')
   if (!isLoggedIn && next.location.pathname != '/login') {
     replace('/login')

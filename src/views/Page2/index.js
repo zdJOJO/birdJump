@@ -45,7 +45,7 @@ class Page2 extends React.Component {
         }
     }
 
-    componentDidMount () {
+    componentWillMount () {
         const {fetchInfo} = this.props;
         fetchInfo(0)
     }

@@ -66,23 +66,13 @@ app.post('/api/menu', function(req, res) {
       menus: [
           {
               key: 1,
-              name: '发布',
+              name: '管理',
               icon: 'user',
               child: [
                   {
-                      name: '选项1',
+                      name: '产品列表',
                       key: 101,
                       url: '/home'
-                  },
-                  {
-                      name: '选项2',
-                      key: 102,
-                      url: '/page2'
-                  },
-                  {
-                      name: '选项3',
-                      key: 103,
-                      url: '/page3'
                   }
               ]
           }

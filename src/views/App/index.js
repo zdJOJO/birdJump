@@ -7,7 +7,6 @@ import NavPath from '../../components/NavPath'
 import Header from '../../components/Header'
 import Sidebar from '../../components/Sidebar'
 import Footer from '../../components/Footer'
-import {fetchProfile, logout} from '../../actions/user';
 
 import './index.less';
 
@@ -16,18 +15,12 @@ class App extends React.Component {
     super(props);
   }
 
-  componentWillMount() {
-    const {actions} = this.props;
-    actions.fetchProfile();
-  }
-
   render() {
-      const {user, actions} = this.props;
       return(
           <div className="ant-layout-aside">
               <Sidebar />
-              <div className="ant-layout-main">
-                  <Header user={user} />
+              <div id="app" className="ant-layout-main">
+                  <Header/>
                   <NavPath />
                   <div className="ant-layout-container">
                       <div className="ant-layout-content">
@@ -41,27 +34,12 @@ class App extends React.Component {
   }
 }
 
-App.propTypes = {
-  user: PropTypes.object,
-  children: PropTypes.node.isRequired
-};
-
 const mapStateToProps = (state) => {
-  const {user} = state;
   return {
-      user: user ? user : null,
-  };
+  }
 };
 
-function mapDispatchToProps(dispatch) {
-  return {
-      actions: bindActionCreators(
-          {
-            fetchProfile, logout
-          }, dispatch)
-  };
-}
 
 export default connect(
-    mapStateToProps, mapDispatchToProps)
-(App);
+    mapStateToProps, {}
+)(App);

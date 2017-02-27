@@ -1,137 +1,260 @@
 import React from 'react'
-import { Row, Col, Collapse, Alert } from 'antd';
-const Panel = Collapse.Panel;
-
-import PanelBox from '../../components/PanelBox';
-
-import {Line,Pie,Doughnut} from 'react-chartjs';
+import {
+    Table, Icon, Alert, Button, Tag,
+    Tabs, Upload, DatePicker, TimePicker,
+    Form, Input, Tooltip, Select,
+} from 'antd';
+const TabPane = Tabs.TabPane;
+const FormItem = Form.Item;
+const Option = Select.Option;
 
 import './index.less'
 
-const chartOption = {
-  responsive: true
-}
+//假数据
+const columns = [{
+    title: '商品集合名称',
+    dataIndex: 'name',
+    key: 'name',
+    render: text => <a href="#">{text}</a>,
+}, {
+    title: 'Age',
+    dataIndex: 'age',
+    key: 'age',
+}, {
+    title: 'Address',
+    dataIndex: 'address',
+    key: 'address',
+}, {
+    title: '操作',
+    key: 'action',
+    render: (text, record) => (
+        <span>
+            <a href="#">
+                <Tooltip title="查看该商品集合列表详情">
+                    <Tag color="cyan"><Icon type="eye-o" /> 查看</Tag>
+                </Tooltip>
+            </a>
+            <span className="ant-divider" />
+            <a href="#" className="ant-dropdown-link">
+                <Tooltip title="创建一个新商品集合">
+                     <Tag color="green-inverse"><Icon type="tag" />创建</Tag>
+                </Tooltip>
+            </a>
+            <span className="ant-divider" />
+            <a href="#">
+                <Tooltip title="编辑此商品集合">
+                    <Tag color="blue-inverse"><Icon type="edit" />编辑</Tag>
+                </Tooltip>
+            </a>
+             <span className="ant-divider" />
+            <a href="#">
+                <Tooltip title="删除此商品集合">
+                    <Tag color="red-inverse"><Icon type="minus-circle" />删除</Tag>
+                </Tooltip>
+            </a>
+        </span>
+    ),
+}];
 
-const lineData = {
-  labels: ["January", "February", "March", "April", "May", "June", "July"],
-  datasets: [
-      {
-          label: "My First dataset",
-          fillColor: "rgba(220,220,220,0.2)",
-          strokeColor: "rgba(220,220,220,1)",
-          pointColor: "rgba(220,220,220,1)",
-          pointStrokeColor: "#fff",
-          pointHighlightFill: "#fff",
-          pointHighlightStroke: "rgba(220,220,220,1)",
-          data: [65, 59, 80, 81, 56, 55, 40]
-      },
-      {
-          label: "My Second dataset",
-          fillColor: "rgba(151,187,205,0.2)",
-          strokeColor: "rgba(151,187,205,1)",
-          pointColor: "rgba(151,187,205,1)",
-          pointStrokeColor: "#fff",
-          pointHighlightFill: "#fff",
-          pointHighlightStroke: "rgba(151,187,205,1)",
-          data: [28, 48, 40, 19, 86, 27, 90]
-      }
-  ]
+
+const columnsTwo = [{
+    title: '商品集合名称',
+    dataIndex: 'bigName',
+    key: 'bigName',
+}, {
+    title: '商品标题',
+    dataIndex: 'name',
+    key: 'name',
+    render: text => <a href="#">{text}</a>,
+}, {
+    title: 'Age',
+    dataIndex: 'age',
+    key: 'age',
+}, {
+    title: 'Address',
+    dataIndex: 'address',
+    key: 'address',
+}, {
+    title: '操作',
+    key: 'action',
+    render: (text, record) => (
+        <span>
+            <a href="#">
+                <Tooltip title="查看该商品详情">
+                    <Tag color="cyan"><Icon type="eye-o" /> 查看</Tag>
+                </Tooltip>
+            </a>
+            <span className="ant-divider" />
+            <a href="#" className="ant-dropdown-link">
+                <Tooltip title="创建一个新商品">
+                     <Tag color="green-inverse"><Icon type="tag" />创建</Tag>
+                </Tooltip>
+            </a>
+            <span className="ant-divider" />
+            <a href="#">
+                <Tooltip title="编辑此商品">
+                    <Tag color="blue-inverse"><Icon type="edit" />编辑</Tag>
+                </Tooltip>
+            </a>
+             <span className="ant-divider" />
+            <a href="#">
+                <Tooltip title="删除此商品">
+                    <Tag color="red-inverse"><Icon type="minus-circle" />删除</Tag>
+                </Tooltip>
+            </a>
+        </span>
+    ),
+}];
+
+const data = [{
+    key: '1',
+    name: 'John Brown',
+    age: 32,
+    address: 'New York No. 1 Lake Park',
+}, {
+    key: '2',
+    name: 'Jim Green',
+    age: 42,
+    address: 'London No. 1 Lake Park',
+}, {
+    key: '3',
+    name: 'Joe Black',
+    age: 32,
+    address: 'Sidney No. 1 Lake Park',
+}];
+
+const propssss = {
+    action: '/upload.do',
+    listType: 'picture',
+    defaultFileList: [{
+        uid: -1,
+        name: 'xxx.png',
+        status: 'done',
+        url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+        thumbUrl: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+    }, {
+        uid: -2,
+        name: 'yyy.png',
+        status: 'done',
+        url: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+        thumbUrl: 'https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png',
+    }],
 };
 
-const pieData = [
-    {
-        value: 300,
-        color:"#F7464A",
-        highlight: "#FF5A5E",
-        label: "Red"
-    },
-    {
-        value: 50,
-        color: "#46BFBD",
-        highlight: "#5AD3D1",
-        label: "Green"
-    },
-    {
-        value: 100,
-        color: "#FDB45C",
-        highlight: "#FFC870",
-        label: "Yellow"
+
+class CreateProductForm extends React.Component {
+    state = {
+        passwordDirty: false,
+    };
+
+    handleChangeTab(key){
+        console.log(key);
     }
-];
 
-const text = `
-  A dog is a type of domesticated animal.
-  Known for its loyalty and faithfulness,
-  it can be found as a welcome guest in many households across the world.
-  A dog is a type of domesticated animal.
-  Known for its loyalty and faithfulness,
-  it can be found as a welcome guest in many households across the world.
-  A dog is a type of domesticated animal.
-  Known for its loyalty and faithfulness,
-  it can be found as a welcome guest in many households across the world.
-`;
+    handleSubmit = (e) => {
+        e.preventDefault();
+        this.props.form.validateFieldsAndScroll((err, values) => {
+            if (!err) {
+                console.log('Received values of form: ', values);
+            }
+        });
+    }
 
-export default class Home extends React.Component {
-  constructor () {
-    super()
-  }
+    render () {
+        const { getFieldDecorator } = this.props.form;
+        const formItemLayout = {
+            labelCol: { span: 7 },
+            wrapperCol: { span: 7 },
+        };
+        const tailFormItemLayout = {
+            wrapperCol: {
+                span: 14,
+                offset: 9,
+            },
+        };
+        const config = {
+            rules: [{ type: 'object', required: true, message: '请选择时间' }],
+        };
+        return (
+            <div id="home">
+                <Tabs defaultActiveKey="1" onChange={this.handleChangeTab}>
+                    <TabPane tab="商品集合列表" key="1">
+                        <Button type="primary" icon="plus-square" onChange={this.handleChangeTab}>创建新商品集合</Button>
+                        <Table columns={columns} dataSource={data} />
+                    </TabPane>
 
-  componentWillMount () {
-  }
+                    <TabPane tab="创建新商品集合" key="2">
+                        <Form onSubmit={this.handleSubmit}>
+                            <FormItem
+                                {...formItemLayout}
+                                label={(
+                                    <span>
+                                      商品集合标题&nbsp;
+                                      <Tooltip title="请填写商品的标题">
+                                        <Icon type="info-circle" />
+                                      </Tooltip>
+                                    </span>
+                                )}
+                                hasFeedback
+                            >
+                                {getFieldDecorator('email', {
+                                    rules: [{
+                                        required: true,
+                                        message: '请填写商品集合的标题',
+                                    }],
+                                })(
+                                    <Input />
+                                )}
+                            </FormItem>
+                            <FormItem
+                                {...formItemLayout}
+                                label={(
+                                    <span>
+                                      开放时间&nbsp;
+                                      <Tooltip title="请选择开放时间">
+                                        <Icon type="calendar" />
+                                      </Tooltip>
+                                    </span>
+                                )}
+                                hasFeedback
+                            >
+                                {getFieldDecorator('date-time-picker', config)(
+                                    <DatePicker showTime format="YYYY-MM-DD HH:mm:ss" />
+                                )}
+                            </FormItem>
+                            <FormItem
+                                {...formItemLayout}
+                                label={(
+                                    <span>
+                                      上传图片&nbsp;
+                                      <Tooltip title="请上传商品集合的图片">
+                                       <Icon type="file-jpg" />
+                                      </Tooltip>
+                                    </span>
+                                )}
+                                hasFeedback
+                            >
+                                <Upload {...propssss}>
+                                    <Button>
+                                        <Icon type="upload" /> upload
+                                    </Button>
+                                </Upload>
+                            </FormItem>
+                            <FormItem {...tailFormItemLayout}>
+                                <Button type="primary" htmlType="submit" size="large">创建</Button>
+                            </FormItem>
+                        </Form>
+                    </TabPane>
 
-  callback() {
-
-  }
-
-  render () {
-    const detail = (
-      <Collapse defaultActiveKey={['1','2','3']} onChange={this.callback}>
-        <Panel header="This is panel header 1" key="1">
-          <p>{text}</p>
-        </Panel>
-        <Panel header="This is panel header 2" key="2">
-          <p>{text}</p>
-        </Panel>
-        <Panel header="This is panel header 3" key="3">
-          <p>{text}</p>
-        </Panel>
-      </Collapse>
-    )
-    return (
-      <div>
-        <Alert
-          message="消息提示的文案"
-          description="消息提示的辅助性文字介绍消息提示的辅助性文，字介绍消息提示的辅助性文字介绍"
-          type="info"
-          showIcon
-        />
-        <PanelBox title="最近的数据">
-          <Line data={lineData} options={chartOption} />
-        </PanelBox>
-        <PanelBox title="最近的数据">
-          <Row className="home-row" type="flex" justify="space-between">
-            <Col span="12">
-              <Pie data={pieData} options={chartOption} />
-              <h3 className="home-title-x">测试数据1</h3>
-            </Col>
-            <Col span="12">
-              <Doughnut data={pieData} options={chartOption} />
-              <h3 className="home-title-x">测试数据2</h3>
-            </Col>
-          </Row>
-        </PanelBox>
-        <Row className="home-row" type="flex" justify="space-between">
-          <Col span="11">
-            {detail}
-          </Col>
-          <Col span="2">
-            {/**/}
-          </Col>
-          <Col span="11">
-            {detail}
-          </Col>
-        </Row>
-      </div>
-    )
-  }
+                    <TabPane tab="商品集合列表" key="3">
+                        <Button type="primary" icon="plus-square" onChange={this.handleChangeTab}>创建新商品</Button>
+                        <Table columns={columnsTwo} dataSource={data} />
+                    </TabPane>
+                </Tabs>
+            </div>
+        )
+    }
 }
+const  Home = Form.create()(CreateProductForm);
+
+export default Home;

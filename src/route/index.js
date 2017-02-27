@@ -11,7 +11,7 @@ import Page3 from '../views/Page3/index';
 import {getCookie} from '../utils/index';
 
 const validate = (next, replace, callback) => {
-  const isLoggedIn = !!getCookie('uid')
+  const isLoggedIn = !!getCookie('adminToken')  //等效于var isLoggedIn = getCookie('adminToken') || false ;
   if (!isLoggedIn && next.location.pathname != '/login') {
     replace('/login')
   }

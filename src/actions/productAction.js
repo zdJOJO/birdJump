@@ -199,22 +199,26 @@ const deleteData =(obj)=>{
 
 //某众筹产品下的获取众筹人情况
 const getFunder = (obj)=>{
+    let url = obj.id ? port + '/fund/goods/fund/'+obj.id+'?currentPage=1&size=200&forUserId=0' : '' ;
     return dispatch =>{
-        dispatch(getFunderSuccees(obj.isShowFunder));
-        // return fetch('')
-        //     .then( res=>{
-        //         return res.json()
-        //     })
-        //     .then( json=>{
-        //         if(json.data.list.length > 0){
-        //             dispatch(getFunderSuccees(obj.isShowFunder, json.data.list));
-        //         }else {
-        //             dispatch(getFunderSuccees(obj.isShowFunder));
-        //         }
-        //     })
-        //     .catch( e =>{
-        //         console.log(e)
-        //     } )
+        if(!obj.id){
+            dispatch(getFunderSuccees(obj.isShowFunder));
+            return
+        }
+        return fetch(url)
+            .then( res=>{
+                return res.json()
+            })
+            .then( json=>{
+                if(json.data.list.length > 0){
+                    dispatch(getFunderSuccees(obj.isShowFunder, json.data.list));
+                }else {
+                    dispatch(getFunderSuccees(obj.isShowFunder));
+                }
+            })
+            .catch( e =>{
+                console.log(e)
+            } )
     }
 }
 

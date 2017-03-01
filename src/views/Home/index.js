@@ -262,6 +262,7 @@ class CreateProductForm extends React.Component {
                         console.log(record, event)
                         disPatchFetchFn({
                             type: 9,
+                            id: record.id,
                             isShowFunder: true
                         })
                     }
@@ -564,13 +565,22 @@ class CreateProductForm extends React.Component {
                             <Pagination defaultCurrent={1} total={goodTotalPage*10} onChange={this.handleChangePageGood.bind(this)}/>
                         }
 
-                        <Modal title="参与该商品众筹的用户" visible={isShowFunder}
+                        <Modal title={<span>参与该商品众筹的用户<Tag color="red">点击用户查看详细信息</Tag></span>} visible={isShowFunder}
                                onOk={()=>{disPatchFetchFn({type:9,isShowFunder:false})}}
                                onCancel={()=>{disPatchFetchFn({type:9,isShowFunder:false})}}
                         >
-                            <p>some contents...</p>
-                            <p>some contents...</p>
-                            <p>some contents...</p>
+                            { goodFunderList.length>0 &&
+                                goodFunderList.map((funder,index)=>{
+                                    return(
+                                        <p key={index}>
+                                            {funder.name}
+                                        </p>
+                                    )
+                                })
+                            }
+                            { goodFunderList.length===0 &&
+                                <span><Icon type="frown-o" /> 暂无众筹人数</span>
+                            }
                         </Modal>
 
                     </TabPane>
@@ -744,7 +754,7 @@ function mapStateToProps (state) {
         goodTotalPage: state.productReducer.good.totalPage,
         goodCurrentPage: state.productReducer.good.currentPage,
         isShowFunder: state.productReducer.good.isShowFunder,
-        goodFunderList: state.productReducer.good.isShowFunder
+        goodFunderList: state.productReducer.good.goodFunderList
     }
 }
 

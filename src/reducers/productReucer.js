@@ -2,9 +2,11 @@
  * Created by Administrator on 2017/02/28 0028.
  */
 import {
-    GET_GOOD_COLLECTIONLIST_SUCCESS,
-    CHANGE_STARTTIME, CHANGE_PIC, CHANGE_TABS,
-    SHOW_ERROR
+    GET_GOOD_COLLECTIONLIST_SUCCESS, GET_GOODLIST_SUCCESS,
+    ClEAN_FORM_DATA, CHANGE_STARTTIME, CHANGE_PIC, CHANGE_TABS,
+    SHOW_ERROR,FETCH_SUCCESS,FETCH_ERROR,
+    SET_FOLDERID,
+    GET_FUUNDER_SUCCESS
 } from '../actions/actionTypes'
 
 const initialState = {
@@ -13,8 +15,29 @@ const initialState = {
     createData:{
         pic: "",
         startTime: 0
-    },
-    goodCollectionList: []
+    },   //创建商品合集
+    isLoading: false,   //是否加载中 是-true
+    goodCollectionList: [],
+    totalPage: 1,   //总页数
+    currentPage: 1,   //当期页数
+
+    good: {
+        folderId: '',   //某个商品集合id
+        goodList: [],  // 某个商品集合的众筹列表
+        info:{
+            title: "",
+            subtitle: "",
+            pic: "",
+            detail: "",
+            price: 0,
+            fundPrice: 0,
+            sum: 1
+        },  // 创建需要提交的信息
+        totalPage: 1,  //总页数
+        currentPage: 1,  //总页数
+        isShowFunder: false, //展示具体众筹的人数
+        goodFunderList: [], //展示具体众筹的人数
+    }
 };
 
 
@@ -24,6 +47,25 @@ export default function productReducer( state=initialState ,action) {
             return{
                 ...state,
                 isShowError: action.isShowError
+            }
+        case FETCH_SUCCESS:
+            return{
+                ...state,
+                isLoading: false
+            }
+        case FETCH_ERROR:
+            return{
+                ...state,
+                isLoading: true
+            }
+        case ClEAN_FORM_DATA:
+            return{
+                ...state,
+                createData:{
+                    ...state.createData,
+                    pic: '',
+                    startTime: '',
+                }
             }
         case CHANGE_STARTTIME:
             return{
@@ -44,12 +86,43 @@ export default function productReducer( state=initialState ,action) {
         case CHANGE_TABS:
             return{
                 ...state,
-                currentKey: action.key
+                currentKey: String(action.currentKey),
+                isSuccess: false,
+                imgList: []
+            }
+        case SET_FOLDERID:
+            return{
+                ...state,
+                good:{
+                    ...state.good,
+                    folderId: action.id
+                }
             }
         case GET_GOOD_COLLECTIONLIST_SUCCESS:
             return{
                 ...state,
-                goodCollectionList: action.list
+                goodCollectionList: action.list,
+                currentPage: action.currentPage,
+                totalPage: action.totalPage
+            }
+        case GET_GOODLIST_SUCCESS:
+            return{
+                ...state,
+                good:{
+                    ...state.good,
+                    goodList: action.list,
+                    currentPage: action.currentPage,
+                    totalPage: action.totalPage
+                }
+            }
+        case GET_FUUNDER_SUCCESS:
+            return{
+                ...state,
+                good:{
+                    ...state.good,
+                    goodFunderList: action.list || [],
+                    isShowFunder: action.isShowFunder
+                }
             }
         default:
             return state

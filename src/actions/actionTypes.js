@@ -16,7 +16,7 @@ export const CHANGE_PIC = 'CHANGE_PIC';
 export const CHANGE_TABS = 'CHANGE_TABS';
 export const SET_FOLDERID = 'SET_FOLDERID';
 export const GET_FUUNDER_SUCCESS = 'GET_FUUNDER_SUCCESS';
-
+export const CHANGE_EDIT_STATU = 'CHANGE_EDIT_STATU';
 
 
 //public

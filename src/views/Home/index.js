@@ -1,5 +1,6 @@
 import React from 'react';
 import {connect} from 'react-redux';
+import Moment from 'moment'
 import {port} from '../../utils'
 
 import {
@@ -22,7 +23,7 @@ const formatTime = (nS)=> {
 import {
     disPatchFetchFn,
     cleanFormData, changeStartTime, changePic, changeTab,
-    setFolderId
+    setFolderId, changeEditState
 } from '../../actions/productAction'
 
 import './index.less'
@@ -100,14 +101,15 @@ class CreateProductForm extends React.Component {
 
     constructor(props){
         super(props)
-        const {disPatchFetchFn, changePic,} = this.props ;
+        const {
+            disPatchFetchFn, changePic, changeEditState
+        } = this.props ;
         this.state = {
             passwordDirty: false,
             propssss: {
                 name: 'upload',
                 action: port + '/fund/file/uploadimage',
                 listType: 'picture',
-                defaultFileList: [],
                 beforeUpload(file){
                     const isJPG = file.type === 'image/jpeg' || file.type === 'image/png';
                     if (!isJPG) {
@@ -151,7 +153,7 @@ class CreateProductForm extends React.Component {
                     rowKey: 'status',
                     render: status =>
                         <Tag color={status===1?"#87d068":(status===2?"#blue":"#f50")}>
-                            {status===1?"正常":(status===2?"未开放":"已结束")}
+                            {status===1?"正常":(status===2?(<Tooltip title="未开放">未开放</Tooltip>):"已结束")}
                         </Tag> ,
                 },{
                     title: '开放时间',
@@ -204,13 +206,16 @@ class CreateProductForm extends React.Component {
                     render: (text, record) => (
                         <span>
                             <Tooltip title="编辑此商品集合">
-                                <Tag color="blue-inverse"
-                                     onClick={this.handleClickTab.bind(this ,2)}
-                                ><Icon type="edit" />编辑</Tag>
+                                <Tag color="blue-inverse"><Icon type="edit" />编辑</Tag>
                             </Tooltip>
                              <span className="ant-divider" />
                         </span>
-                    )
+                    ),
+                    onCellClick: (record, event)=>{
+                        console.log(record, event)
+                        changeEditState(record, 1);
+                        this.handleClickTab(2, -1);
+                    }
                 },{
                     key: 'delete',
                     width: '',
@@ -272,13 +277,16 @@ class CreateProductForm extends React.Component {
                     render: (text, record) => (
                         <span>
                                 <Tooltip title="编辑此众筹商品">
-                                    <Tag color="blue-inverse"
-                                         onClick={this.handleClickTab.bind(this ,2)}
-                                    ><Icon type="edit" />编辑</Tag>
+                                    <Tag color="blue-inverse"><Icon type="edit" />编辑</Tag>
                                 </Tooltip>
                                  <span className="ant-divider" />
                             </span>
-                    )
+                    ),
+                    onCellClick: (record, event)=>{
+                        console.log(record, event);
+                        changeEditState(record, 2);
+                        this.handleClickTab(4, '编辑')
+                    }
                 },{
                     key: 'delete',
                     width: '',
@@ -310,18 +318,27 @@ class CreateProductForm extends React.Component {
     }
 
     handleClickTab(key, _id){
-        const {changeTab, cleanFormData, setFolderId} = this.props;
+        const {changeTab, cleanFormData, setFolderId, changeEditState, editId} = this.props;
+        console.log(key, _id)
+        console.log('editId: ', editId)
         changeTab(key);
-        //切换tab 清空Form表单数据 和修改store中的数据
-        this.props.form.setFieldsValue({
-            'text': ''
-        });
-        cleanFormData();
 
-        if(_id){     //创建新的众筹  和 查看众筹列表
+        // if(!editId){
+        //     //切换tab 清空Form表单数据 和修改store中的数据
+        //     this.props.form.setFieldsValue({
+        //         'text': ''
+        //     });
+        //     cleanFormData();
+        // }
+
+        if(key===1||key===3){
+            changeEditState('')
+        }
+
+        if(_id>0){     // 查看众筹列表
             setFolderId(_id)
         }else {
-            if(!key)
+            if(_id !== '编辑')
                 setFolderId('')
         }
     }
@@ -354,23 +371,27 @@ class CreateProductForm extends React.Component {
         e.preventDefault();
         const {
             disPatchFetchFn,
-            pic, startTime
+            pic, startTime, editId
         } = this.props;
 
         this.props.form.validateFieldsAndScroll((err, values) => {
             if (!err) {
                 console.log('Received values of form: ', values);
-                if(!pic){
+                if(!pic && !editId){
                     message.error('Please add picture !!!');
                     return
                 }
+                let data  = {
+                    pic: pic,
+                    title: values.text,
+                    startTime: startTime
+                }
+                if(editId){
+                    data.id = editId
+                }
                 disPatchFetchFn({
-                    type: 1,
-                    data:{
-                        pic: pic,
-                        title: values.text,
-                        startTime: startTime
-                    }
+                    type: editId ? 10 : 1,
+                    data: data
                 })
             }
         });
@@ -380,29 +401,34 @@ class CreateProductForm extends React.Component {
         e.preventDefault();
         const {
             disPatchFetchFn,
-            pic, folderId
+            pic, folderId,
+            editId,
         } = this.props;
 
         this.props.form.validateFieldsAndScroll((err, values) => {
             console.log(err, values)
             if (!err) {
                 console.log('Received values of form: ', values);
-                if(!pic){
+                if(!pic && !editId){
                     message.error('Please add picture !!!');
                     return
                 }
+                let data = {
+                    folderId: folderId,
+                    title: values.goodTitle,
+                    subtitle: values.goodSubtitle,
+                    pic: pic,
+                    detail: values.goodDetail,
+                    price: values.price,
+                    sum: values.goodNum
+                }
+                if(editId){
+                    data.id = editId ;
+                }
+
                 disPatchFetchFn({
-                    type: 6,
-                    id: folderId,
-                    data:{
-                        folderId: folderId,
-                        title: values.goodTitle,
-                        subtitle: values.goodSubtitle,
-                        pic: pic,
-                        detail: values.goodDetail,
-                        price: values.price,
-                        sum: values.goodNum
-                    }
+                    type: editId ? 11 : 6 ,
+                    data: data
                 })
             }
         });
@@ -438,7 +464,9 @@ class CreateProductForm extends React.Component {
         const {
             goodCollectionList, currentKey, isLoading, totalPage, folderId,
             goodList,goodTotalPage,
-            disPatchFetchFn, isShowFunder, goodFunderList
+            disPatchFetchFn, isShowFunder, goodFunderList,
+            editId, collectionTitle, startTime,
+            goodTitle, subtitle, detail, price, sum
         } = this.props;
 
         const { getFieldDecorator } = this.props.form;
@@ -453,6 +481,7 @@ class CreateProductForm extends React.Component {
             },
         };
         const config = {
+            initialValue: editId ? Moment(startTime*1000) :  Moment(0),
             rules: [{ type: 'object', required: folderId ? false : true, message: '请选择时间' }],
         };
         return (
@@ -463,7 +492,7 @@ class CreateProductForm extends React.Component {
                 >
                     {/*商品集合 列表*/}
                     <TabPane tab="商品集合列表" key="1">
-                        <Button type="primary" icon="plus-square" onClick={this.handleClickTab.bind(this, 2)}>创建新商品集合</Button>
+                        <Button type="primary" icon="plus-square" onClick={this.handleClickTab.bind(this, 2, -1)}>创建新商品集合</Button>
                         <Table
                             key="商品集合列表"
                             columns={this.state.collectionListColumns}
@@ -477,7 +506,7 @@ class CreateProductForm extends React.Component {
                     </TabPane>
 
                     {/*创建新商品集合*/}
-                    <TabPane tab="创建新商品集合" key="2">
+                    <TabPane tab={<span>创建新商品集合{ editId ? <Tag color="red">商品集合编辑中...</Tag>:''}</span>} key="2">
                         <Button type="primary" icon="arrow-left" onClick={this.handleClickTab.bind(this, 1)}>返回</Button>
                         <Form onSubmit={this.handleSubmit}>
                             <FormItem
@@ -493,6 +522,7 @@ class CreateProductForm extends React.Component {
                                 hasFeedback
                             >
                                 { getFieldDecorator('text', {
+                                    initialValue: editId ? collectionTitle : "",
                                     rules: [{
                                         required: folderId ? false : true,
                                         message: '请填写商品集合的标题',
@@ -544,7 +574,7 @@ class CreateProductForm extends React.Component {
 
 
                             <FormItem {...tailFormItemLayout}>
-                                <Button type="primary" htmlType="submit" size="large">创建</Button>
+                                <Button type="primary" htmlType="submit" size="large">{editId ? '更新合集' : '创建合集'}</Button>
                             </FormItem>
                         </Form>
                     </TabPane>
@@ -586,7 +616,7 @@ class CreateProductForm extends React.Component {
                     </TabPane>
 
                     {/*创建某商品集合下的新产品*/}
-                    <TabPane tab="创建新众筹" key="4">
+                    <TabPane tab={<span>创建新商品集合{ editId ? <Tag color="red">众筹编辑中...</Tag>:''}</span>} key="4">
                         <Button type="primary" icon="arrow-left" onClick={this.handleClickTab.bind(this, 3)}>返回</Button>
                         <Form onSubmit={this.handleGoodInfoSubmit}>
                             <FormItem
@@ -602,6 +632,7 @@ class CreateProductForm extends React.Component {
                                 hasFeedback
                             >
                                 { getFieldDecorator('goodTitle', {
+                                    initialValue: editId ? goodTitle : "",
                                     rules: [{
                                         required: folderId,
                                         message: '请填写众筹标题',
@@ -624,6 +655,7 @@ class CreateProductForm extends React.Component {
                                 hasFeedback
                             >
                                 { getFieldDecorator('goodSubtitle', {
+                                    initialValue: editId ? subtitle : "",
                                     rules: [{
                                         required: folderId,
                                         message: '请填写众筹副标题',
@@ -647,11 +679,11 @@ class CreateProductForm extends React.Component {
                                 hasFeedback
                             >
                                 { getFieldDecorator('price', {
+                                    initialValue: editId ? price : 1,
                                     rules: [{
                                         required: folderId,
                                         message: '请填写每个众筹商品的价格',
                                     }],
-                                    initialValue: 1
                                 })(
                                     <InputNumber min={1} max={10000000} />
                                 )}
@@ -672,11 +704,11 @@ class CreateProductForm extends React.Component {
                                 hasFeedback
                             >
                                 { getFieldDecorator('goodNum', {
+                                    initialValue: editId ? sum : 1,
                                     rules: [{
                                         required: folderId,
                                         message: '请填写众筹商品的数目',
                                     }],
-                                    initialValue: 1
                                 })(
                                     <InputNumber min={1} max={100} />
                                 )}
@@ -696,6 +728,7 @@ class CreateProductForm extends React.Component {
                                 hasFeedback
                             >
                                 { getFieldDecorator('goodDetail', {
+                                    initialValue: editId ? detail : '',
                                     rules: [{
                                         required: folderId,
                                         message: '请填写众筹描述详情',
@@ -725,7 +758,7 @@ class CreateProductForm extends React.Component {
                                 </Upload>
                             </FormItem>
                             <FormItem {...tailFormItemLayout}>
-                                <Button type="primary" htmlType="submit" size="large">创建</Button>
+                                <Button type="primary" htmlType="submit" size="large">{editId ? '更新众筹' : '创建众筹'}</Button>
                             </FormItem>
                         </Form>
                     </TabPane>
@@ -743,8 +776,9 @@ function mapStateToProps (state) {
         totalPage: state.productReducer.totalPage,
         currentPage: state.productReducer.currentPage,
 
-        startTime: state.productReducer.createData.startTime,
-        pic: state.productReducer.createData.pic,
+        collectionTitle: state.productReducer.createData.collectionTitle, //*
+        startTime: state.productReducer.createData.startTime,  //*
+        pic: state.productReducer.createData.pic,  //*
 
         isLoading: state.productReducer.isLoading,
         isShowError: state.productReducer.isShowError,
@@ -754,7 +788,14 @@ function mapStateToProps (state) {
         goodTotalPage: state.productReducer.good.totalPage,
         goodCurrentPage: state.productReducer.good.currentPage,
         isShowFunder: state.productReducer.good.isShowFunder,
-        goodFunderList: state.productReducer.good.goodFunderList
+        goodFunderList: state.productReducer.good.goodFunderList,
+
+        editId: state.productReducer.editId, //*
+        goodTitle: state.productReducer.good.info.title, //*
+        subtitle: state.productReducer.good.info.subtitle, //*
+        detail: state.productReducer.good.info.detail, //*
+        price: state.productReducer.good.info.price, //*
+        sum: state.productReducer.good.info.sum //*
     }
 }
 
@@ -763,6 +804,6 @@ export default connect(
     {
         disPatchFetchFn,
         cleanFormData, changeStartTime, changePic ,changeTab,
-        setFolderId
+        setFolderId, changeEditState
     }
 )(Home);

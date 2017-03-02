@@ -9,7 +9,8 @@ import {
     ClEAN_FORM_DATA, CHANGE_STARTTIME, CHANGE_PIC,
     SHOW_ERROR,FETCH_SUCCESS,FETCH_ERROR,
     CHANGE_TABS,SET_FOLDERID,
-    GET_FUUNDER_SUCCESS
+    GET_FUUNDER_SUCCESS,
+    CHANGE_EDIT_STATU
 } from '../actions/actionTypes'
 
 
@@ -59,8 +60,8 @@ export const changePic =(pic)=>{
     }
 }
 
-// 切换 tab   isSuccess都会变成 false
-export const changeTab = currentKey =>{
+// 切换 tab   isSuccess都会变成 false;  此处判断是否 为编辑状态
+export const changeTab = (currentKey) =>{
     return{
         type: CHANGE_TABS,
         currentKey
@@ -106,7 +107,17 @@ const getFunderSuccees =(isShowFunder, _list)=>{
     }
 }
 
+//修改 edit 状态
+//typeNum:  1-商品集合  2-众筹
+export const changeEditState =(obj, typeNum)=>{
+    return{
+        type: CHANGE_EDIT_STATU,
+        obj,
+        typeNum
+    }
+}
 
+/***********************************/
 //创建一个商品集合 POST
 const createGoodCollection =(obj)=>{
     // obj.type=== 1 || 6
@@ -133,7 +144,7 @@ const createGoodCollection =(obj)=>{
                         dispatch( getList({type: 2, page: 1 }));
                         dispatch(changeTab(1))
                     }else {
-                        dispatch( getList({type: 7, page: 1, id: obj.id }));
+                        dispatch( getList({type: 7, page: 1, id: obj.data.folderId }));
                         dispatch(changeTab(3))
                     }
                 }else if(json.code === '601'){
@@ -197,7 +208,7 @@ const deleteData =(obj)=>{
 }
 
 
-//某众筹产品下的获取众筹人情况
+//某众筹产品下的获取众筹人情况 GET
 const getFunder = (obj)=>{
     let url = obj.id ? port + '/fund/goods/fund/'+obj.id+'?currentPage=1&size=200&forUserId=0' : '' ;
     return dispatch =>{
@@ -223,18 +234,75 @@ const getFunder = (obj)=>{
 }
 
 
+//编辑 PUT
+const editInfo =obj=>{
+    let upDataStr = obj.type===10 ? 'goodsFolder' : 'goods' ;
+    let url = port + '/fund/' + upDataStr + '/update?token=' + getCookie('adminToken');
+    let data = obj.type===10 ? {
+        id: obj.data.id,
+        pic: obj.data.pic,
+        startTime: obj.data.startTime,
+        title: obj.data.title
+    } : {
+        id: obj.data.id,
+        title: obj.data.title,
+        subtitle: obj.data.subtitle,
+        detail: obj.data.detail,
+        price: obj.data.price,
+        sum: obj.data.sum
+    };
+    return dispatch =>{
+        return fetch( url , {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then( res =>{
+                return res.json()
+            })
+            .then( json =>{
+                console.log(json)
+                if(json.code === '666'){
+                    delCookie('adminToken');
+                    location.hash = '#/login';
+                }else if(json.code === '202'){
+                    dispatch(changeEditState(''));   //清除编辑状态
+                    dispatch(cleanFormData());    //清空 store的 数据
+                    if( obj.type===10){
+                        dispatch( getList({type: 2, page: 1 }));
+                        dispatch(changeTab(1))
+                    }else {
+                        dispatch( getList({type: 7, page: 1, id: obj.data.folderId }));
+                        dispatch(changeTab(3))
+                    }
+                }else if(json.code === '601'){
+                    console.log('创建失败')
+                }
+            })
+            .catch( e =>{
+                console.log(e)
+            })
+    }
+}
+
+
 /*
 *  obj.type 取值
 *  1 - 创建新商品集合
 *  2 - 获取商品集合列表
+*  3 - 查看商品集合下的众筹列表
 *  4 - 编辑此商品集合
 *  5 - 删除此商品集合
+*  10 - 编辑此集合列表
 *
-*  3 - 查看商品集合下的众筹列表
 *  6 - 创建某商品集合下的众筹
 *  7 - 获取某商品集合下的众筹列表
 *  8 - 删除此众筹商品
+*  11 - 编辑此众筹商品
 *  9 - 查看某众筹商品下的具体众筹人数
+*
 * */
 export const disPatchFetchFn =(obj)=>{
     return dispatch =>{
@@ -252,7 +320,13 @@ export const disPatchFetchFn =(obj)=>{
             case 8:
                 return dispatch(deleteData(obj));
             case 9:
-                return dispatch(getFunder(obj))
+                return dispatch(getFunder(obj));
+            case 10:
+                console.log(1111111111111111)
+                console.log(obj)
+                return dispatch(editInfo(obj));
+            case 11:
+                return dispatch(editInfo(obj));
             default:
                 return false
         }

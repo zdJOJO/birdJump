@@ -6,13 +6,15 @@ import {
     ClEAN_FORM_DATA, CHANGE_STARTTIME, CHANGE_PIC, CHANGE_TABS,
     SHOW_ERROR,FETCH_SUCCESS,FETCH_ERROR,
     SET_FOLDERID,
-    GET_FUUNDER_SUCCESS
+    GET_FUUNDER_SUCCESS,
+    CHANGE_EDIT_STATU
 } from '../actions/actionTypes'
 
 const initialState = {
     currentKey: '1', //控制 tab 当前的显示key
     isShowError: false,   //true 出现
     createData:{
+        collectionTitle: '',
         pic: "",
         startTime: 0
     },   //创建商品合集
@@ -27,17 +29,17 @@ const initialState = {
         info:{
             title: "",
             subtitle: "",
-            pic: "",
             detail: "",
             price: 0,
-            fundPrice: 0,
             sum: 1
         },  // 创建需要提交的信息
         totalPage: 1,  //总页数
         currentPage: 1,  //总页数
         isShowFunder: false, //展示具体众筹的人数
         goodFunderList: [], //展示具体众筹的人数
-    }
+    },
+
+    editId: ''      // 要编辑的id
 };
 
 
@@ -63,9 +65,22 @@ export default function productReducer( state=initialState ,action) {
                 ...state,
                 createData:{
                     ...state.createData,
+                    collectionTitle: '',
                     pic: '',
-                    startTime: '',
+                    startTime: ''
+                },
+                good:{
+                    ...state.good,
+                    info:　{
+                        ...state.good.info,
+                        title: '',
+                        subtitle: '',
+                        detail: '',
+                        price: '',
+                        sum: ''
+                    }
                 }
+
             }
         case CHANGE_STARTTIME:
             return{
@@ -96,6 +111,40 @@ export default function productReducer( state=initialState ,action) {
                 good:{
                     ...state.good,
                     folderId: action.id
+                }
+            }
+        case CHANGE_EDIT_STATU:
+            if(action.typeNum === 1){
+                return{
+                    ...state,
+                    editId: action.obj.id,
+                    createData: {
+                        ...state.createData,
+                        collectionTitle: action.obj.title,
+                        pic: action.obj.pic,
+                        startTime: action.obj.startTime
+                    }
+                }
+            }else if(action.typeNum === 2){
+                return{
+                    ...state,
+                    editId: action.obj.id,
+                    good:{
+                        ...state.good,
+                        info:　{
+                            ...state.good.info,
+                            title: action.obj.title,
+                            subtitle: action.obj.subtitle,
+                            detail: action.obj.detail,
+                            price: action.obj.price,
+                            sum: action.obj.sum
+                        }
+                    }
+                }
+            }else {
+                return{
+                    ...state,
+                    editId: ''
                 }
             }
         case GET_GOOD_COLLECTIONLIST_SUCCESS:

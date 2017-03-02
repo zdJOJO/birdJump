@@ -1,38 +1,35 @@
 import React from 'react'
-import { Row, Col, Icon, Menu, Dropdown } from 'antd'
+import { Icon, Menu } from 'antd'
 import './index.less'
-import { Link } from 'react-router'
 
 const SubMenu = Menu.SubMenu;
-const MenuItemGroup = Menu.ItemGroup;
+
+import {delCookie} from '../../utils'
 
 export default class Header extends React.Component {
-  constructor () {
-    super()
-  }
 
   handleClick () {
-
+      delCookie('adminToken');
+      location.hash = '#/login';
   }
 
-  render () {
-    return (
-      <div className='ant-layout-header'>
-        <Menu className="header-menu" onClick={this.handleClick}
-        mode="horizontal">
-          <SubMenu
-              title={<span><Icon type="user" />admin</span>}
-          >
-            <Menu.Item key="setting:1">选项1</Menu.Item>
-            <Menu.Item key="setting:2">选项2</Menu.Item>
-            <Menu.Divider />
-            <Menu.Item key="setting:3">注销</Menu.Item>
-          </SubMenu>
-          <Menu.Item key="mail">
-            <Icon type="question" />帮助
-          </Menu.Item>
-        </Menu>
-      </div>
-    )
+  render (){
+      return (
+          <div className='ant-layout-header'>
+              <Menu className="header-menu" onClick={this.handleClick}
+                    mode="horizontal">
+                  <SubMenu
+                      title={<span><Icon type="user" />admin</span>}
+                  >
+                    <Menu.Divider />
+                    <Menu.Item key="setting:3" onClick={this.handleClick.bind(this)}>退出</Menu.Item>
+                  </SubMenu>
+                  <Menu.Item key="mail">
+                    <Icon type="question" />帮助
+                  </Menu.Item>
+                </Menu>
+          </div>
+      )
   }
+
 }

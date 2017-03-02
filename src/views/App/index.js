@@ -1,10 +1,7 @@
 import React, {PropTypes} from 'react';
-import {bindActionCreators} from 'redux';
-import {connect} from 'react-redux';
-import {Affix , Row, Col} from 'antd';
 
 import NavPath from '../../components/NavPath'
-import Header from '../../components/Header'
+import Header from '../../components/Header/index'
 import Sidebar from '../../components/Sidebar'
 import Footer from '../../components/Footer'
 
@@ -34,12 +31,4 @@ class App extends React.Component {
   }
 }
 
-const mapStateToProps = (state) => {
-  return {
-  }
-};
-
-
-export default connect(
-    mapStateToProps, {}
-)(App);
+export default App

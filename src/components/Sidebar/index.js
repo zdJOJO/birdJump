@@ -17,6 +17,21 @@ const propTypes = {
   items: PropTypes.array
 }
 
+const menus = [
+    {
+        key: 1,
+        name: '管理',
+        icon: 'user',
+        child: [
+            {
+              name: '产品列表',
+              key: 101,
+              url: '/home'
+            }
+        ]
+    }
+];
+
 class Sidebar extends React.Component {
   constructor (props) {
     super(props)
@@ -39,45 +54,47 @@ class Sidebar extends React.Component {
   }
 
   render () {
-    const { items } = this.props
-    const { router } = this.context
-    let openKey = []
-    let activeKey = this.state.activeKey
-    const menu = items.map((item) => {
-      openKey.push('sub'+item.key)
-      return (
-        <SubMenu
-          key={'sub'+item.key}
-          title={<span><Icon type={item.icon} />{item.name}</span>}
-        >
-          {
-            item.child.map((node) => {
-            if(node.url && router.isActive(node.url, true)){
-              activeKey = 'menu'+node.key
-            }
-            let url = node.url
-            return (
-              <Menu.Item key={'menu'+node.key}>
-                <Link to={url}>{node.name}</Link>
-              </Menu.Item>
-            )
-          })}
-        </SubMenu>
-      )
-    });
+      const { items } = this.props
+      const { router } = this.context
+      let openKey = [];
+      let activeKey = this.state.activeKey
 
-    return (
-      <aside className="ant-layout-sider">
-        <div className="ant-layout-logo"></div>
-        <Menu
-          mode="inline" theme="dark" openKeys={openKey}
-          selectedKeys={[activeKey]}
-          onClick={this.menuClickHandle}
-        >
-          {menu}
-        </Menu>
-      </aside>
-    )
+      const menu = menus.map((item) => {
+          openKey.push('sub'+item.key)
+              return (
+                  <SubMenu
+                      key={'sub'+item.key}
+                      title={<span><Icon type={item.icon} />{item.name}</span>}
+                  >
+                      {
+                          item.child.map((node) => {
+                              if(node.url && router.isActive(node.url, true)){
+                                activeKey = 'menu'+node.key
+                              }
+                              let url = node.url
+                              return (
+                                  <Menu.Item key={'menu'+node.key}>
+                                    <Link to={url}>{node.name}</Link>
+                                  </Menu.Item>
+                              )
+                          })}
+                  </SubMenu>
+              )
+          }
+      );
+
+      return (
+          <aside className="ant-layout-sider">
+              <div className="ant-layout-logo"></div>
+                  <Menu
+                      mode="inline" theme="dark" openKeys={openKey}
+                      selectedKeys={[activeKey]}
+                      onClick={this.menuClickHandle}
+                  >
+                    {menu}
+                  </Menu>
+          </aside>
+      )
   }
 }
 

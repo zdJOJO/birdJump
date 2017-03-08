@@ -10,7 +10,7 @@ import {
     SHOW_ERROR,FETCH_SUCCESS,FETCH_ERROR,
     CHANGE_TABS,SET_FOLDERID,
     GET_FUUNDER_SUCCESS,
-    CHANGE_EDIT_STATU
+    CHANGE_EDIT_STATU, CHANGE_LOGO_PIC, START_CREATE
 } from '../actions/actionTypes'
 
 
@@ -37,6 +37,16 @@ export const showError =(isShowError)=>{
 }
 
 
+// 锁定 按钮
+export const lockBtn =(isButtonLock)=>{
+    return{
+        type: START_CREATE,
+        isButtonLock
+    }
+}
+
+
+
 //修改名称
 export const cleanFormData =()=>{
     return{
@@ -59,6 +69,17 @@ export const changePic =(pic)=>{
         pic
     }
 }
+
+
+//修改众筹logo 
+export const changeLogoPic =(pic)=>{
+    return{
+        type: CHANGE_LOGO_PIC,
+        pic
+    }
+}
+
+
 
 // 切换 tab   isSuccess都会变成 false;  此处判断是否 为编辑状态
 export const changeTab = (currentKey) =>{
@@ -125,6 +146,7 @@ const createGoodCollection =(obj)=>{
         : port + '/fund/goods/create?token=' + getCookie('adminToken') ;
     let data = obj.data;
     return dispatch => {
+        dispatch(lockBtn(true));
         return fetch( url ,{
             method: 'POST',
             headers: {
@@ -136,6 +158,7 @@ const createGoodCollection =(obj)=>{
                 return res.json()
             })
             .then( json =>{
+                dispatch(lockBtn(false));
                 if(json.code === '666'){
                     delCookie('adminToken');
                     location.hash = '#/login';
@@ -210,7 +233,7 @@ const deleteData =(obj)=>{
 
 //某众筹产品下的获取众筹人情况 GET
 const getFunder = (obj)=>{
-    let url = obj.id ? port + '/fund/goods/fund/'+obj.id+'?currentPage=1&size=200&forUserId=0' : '' ;
+    let url = port + '/fund/goods/fund/'+obj.id+'?currentPage=1&size=200' ;
     return dispatch =>{
         if(!obj.id){
             dispatch(getFunderSuccees(obj.isShowFunder));
@@ -221,8 +244,8 @@ const getFunder = (obj)=>{
                 return res.json()
             })
             .then( json=>{
-                if(json.data.list.length > 0){
-                    dispatch(getFunderSuccees(obj.isShowFunder, json.data.list));
+                if(json.data.length > 0){
+                    dispatch(getFunderSuccees(obj.isShowFunder, json.data));
                 }else {
                     dispatch(getFunderSuccees(obj.isShowFunder));
                 }
@@ -322,8 +345,6 @@ export const disPatchFetchFn =(obj)=>{
             case 9:
                 return dispatch(getFunder(obj));
             case 10:
-                console.log(1111111111111111)
-                console.log(obj)
                 return dispatch(editInfo(obj));
             case 11:
                 return dispatch(editInfo(obj));

@@ -7,7 +7,7 @@ import {
     SHOW_ERROR,FETCH_SUCCESS,FETCH_ERROR,
     SET_FOLDERID,
     GET_FUUNDER_SUCCESS,
-    CHANGE_EDIT_STATU
+    CHANGE_EDIT_STATU,CHANGE_LOGO_PIC, START_CREATE
 } from '../actions/actionTypes'
 
 const initialState = {
@@ -26,7 +26,9 @@ const initialState = {
     good: {
         folderId: '',   //某个商品集合id
         goodList: [],  // 某个商品集合的众筹列表
+        logoPic: '', //logo图片
         info:{
+            goodPlace: '',
             title: "",
             subtitle: "",
             detail: "",
@@ -39,12 +41,19 @@ const initialState = {
         goodFunderList: [], //展示具体众筹的人数
     },
 
-    editId: ''      // 要编辑的id
+    editId: '',      // 要编辑的id
+    isButtonLock: false   //创建时候锁定按钮
 };
 
 
 export default function productReducer( state=initialState ,action) {
     switch (action.type){
+        case START_CREATE:{
+            return{
+                ...state,
+                isButtonLock: action.isButtonLock
+            }
+        }
         case SHOW_ERROR:
             return{
                 ...state,
@@ -71,13 +80,15 @@ export default function productReducer( state=initialState ,action) {
                 },
                 good:{
                     ...state.good,
+                    logoPic: '',
                     info:　{
                         ...state.good.info,
                         title: '',
                         subtitle: '',
                         detail: '',
                         price: '',
-                        sum: ''
+                        sum: '',
+                        goodPlace: ''
                     }
                 }
 
@@ -98,6 +109,15 @@ export default function productReducer( state=initialState ,action) {
                     pic: action.pic
                 }
             }
+        case CHANGE_LOGO_PIC:{
+            return{
+                ...state,
+                good:{
+                    ...state.good,
+                    logoPic: action.pic
+                }
+            }
+        }
         case CHANGE_TABS:
             return{
                 ...state,
@@ -169,7 +189,7 @@ export default function productReducer( state=initialState ,action) {
                 ...state,
                 good:{
                     ...state.good,
-                    goodFunderList: action.list || [],
+                    goodFunderList: action._list || [],
                     isShowFunder: action.isShowFunder
                 }
             }

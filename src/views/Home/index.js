@@ -6,7 +6,8 @@ import {port} from '../../utils'
 import {
     Table, Icon, Alert, Button, Tag, Pagination,
     Tabs, Upload, DatePicker, InputNumber,
-    Form, Input, Tooltip, message, Modal
+    Form, Input, Tooltip, message,
+    Modal, Dropdown, Menu, Row, Col
 } from 'antd';
 const TabPane = Tabs.TabPane;
 const FormItem = Form.Item;
@@ -23,86 +24,19 @@ const formatTime = (nS)=> {
 import {
     disPatchFetchFn,
     cleanFormData, changeStartTime, changePic, changeTab,
-    setFolderId, changeEditState
+    setFolderId, changeEditState, changeLogoPic, lockBtn
 } from '../../actions/productAction'
 
 import './index.less'
 
 // status： 1正常 2未开发 3已结束
 
-
-const columnsTwo = [{
-    title: '商品集合名称',
-    dataIndex: 'bigName',
-    key: 'bigName',
-}, {
-    title: '商品标题',
-    dataIndex: 'name',
-    key: 'name',
-    render: text => <a href="#">{text}</a>,
-}, {
-    title: 'Age',
-    dataIndex: 'age',
-    key: 'age',
-}, {
-    title: 'Address',
-    dataIndex: 'address',
-    key: 'address',
-}, {
-    title: '操作',
-    key: 'action',
-    render: (text, record) => (
-        <span>
-            <a href="#">
-                <Tooltip title="查看该众筹详情">
-                    <Tag color="cyan"><Icon type="eye-o" /> 查看</Tag>
-                </Tooltip>
-            </a>
-            <span className="ant-divider" />
-            <a href="#" className="ant-dropdown-link">
-                <Tooltip title="创建一个新众筹">
-                     <Tag color="green-inverse"><Icon type="tag" />创建</Tag>
-                </Tooltip>
-            </a>
-            <span className="ant-divider" />
-            <a href="#">
-                <Tooltip title="编辑此众筹">
-                    <Tag color="blue-inverse"><Icon type="edit" />编辑</Tag>
-                </Tooltip>
-            </a>
-             <span className="ant-divider" />
-            <a href="#">
-                <Tooltip title="下架此众筹">
-                    <Tag color="red"><Icon type="down-square-o" />下架</Tag>
-                </Tooltip>
-            </a>
-        </span>
-    ),
-}];
-
-const data = [{
-    key: '1',
-    name: 'John Brown',
-    age: 32,
-    address: 'New York No. 1 Lake Park',
-}, {
-    key: '2',
-    name: 'Jim Green',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-}, {
-    key: '3',
-    name: 'Joe Black',
-    age: 32,
-    address: 'Sidney No. 1 Lake Park',
-}];
-
 class CreateProductForm extends React.Component {
 
     constructor(props){
         super(props)
         const {
-            disPatchFetchFn, changePic, changeEditState
+            disPatchFetchFn, changePic, changeEditState, changeLogoPic
         } = this.props ;
         this.state = {
             passwordDirty: false,
@@ -129,6 +63,38 @@ class CreateProductForm extends React.Component {
                             changePic('');
                         }else {
                             changePic(info.fileList[info.fileList.length-1].response.url);
+                        }
+                    }
+                    if (info.file.status === 'done') {
+                        message.success(`${info.file.name} file uploaded successfully`);
+                    } else if (info.file.status === 'error') {
+                        message.error(`${info.file.name} file upload failed.`);
+                    }
+                }
+            },
+            logoPicPropssss: {
+                name: 'upload',
+                action: port + '/fund/file/uploadimage',
+                listType: 'picture',
+                beforeUpload(file){
+                    const isJPG = file.type === 'image/jpeg' || file.type === 'image/png';
+                    if (!isJPG) {
+                        message.error('You can only upload JPG file!');
+                    }
+                    const isLt2M = file.size / 1024 / 1024 < 2;
+                    if (!isLt2M) {
+                        message.error('Image must smaller than 2MB!');
+                    }
+                    return isJPG && isLt2M;
+                },
+                onChange(info) {
+                    console.log(info)
+                    if (info.file.status !== 'uploading') {
+                        console.log(info.file, info.fileList);
+                        if(info.fileList.length === 0){
+                            changeLogoPic('');
+                        }else {
+                            changeLogoPic(info.fileList[info.fileList.length-1].response.url);
                         }
                     }
                     if (info.file.status === 'done') {
@@ -310,11 +276,12 @@ class CreateProductForm extends React.Component {
     }
 
     componentWillMount(){
-        const {disPatchFetchFn} = this.props;
+        const {disPatchFetchFn, lockBtn} = this.props;
         disPatchFetchFn({
             type: 2,
             page: 1
         });
+        lockBtn(false)
     }
 
     handleClickTab(key, _id){
@@ -401,7 +368,7 @@ class CreateProductForm extends React.Component {
         e.preventDefault();
         const {
             disPatchFetchFn,
-            pic, folderId,
+            pic, logoPic, folderId,
             editId,
         } = this.props;
 
@@ -420,7 +387,9 @@ class CreateProductForm extends React.Component {
                     pic: pic,
                     detail: values.goodDetail,
                     price: values.price,
-                    sum: values.goodNum
+                    sum: values.goodNum,
+                    place: values.goodPlace,
+                    logoPic: logoPic
                 }
                 if(editId){
                     data.id = editId ;
@@ -464,15 +433,15 @@ class CreateProductForm extends React.Component {
         const {
             goodCollectionList, currentKey, isLoading, totalPage, folderId,
             goodList,goodTotalPage,
-            disPatchFetchFn, isShowFunder, goodFunderList,
+            disPatchFetchFn, isShowFunder, goodFunderList, isButtonLock,
             editId, collectionTitle, startTime,
-            goodTitle, subtitle, detail, price, sum
+            goodTitle, subtitle, detail, price, sum, goodPlace
         } = this.props;
 
         const { getFieldDecorator } = this.props.form;
         const formItemLayout = {
             labelCol: { span: 7 },
-            wrapperCol: { span: 7 },
+            wrapperCol: { span: 7 }
         };
         const tailFormItemLayout = {
             wrapperCol: {
@@ -484,6 +453,7 @@ class CreateProductForm extends React.Component {
             initialValue: editId ? Moment(startTime*1000) :  Moment(0),
             rules: [{ type: 'object', required: folderId ? false : true, message: '请选择时间' }],
         };
+
         return (
             <div id="home">
                 <Tabs
@@ -574,7 +544,7 @@ class CreateProductForm extends React.Component {
 
 
                             <FormItem {...tailFormItemLayout}>
-                                <Button type="primary" htmlType="submit" size="large">{editId ? '更新合集' : '创建合集'}</Button>
+                                <Button type="primary" htmlType="submit" size="large"  loading={isButtonLock}>{editId ? '更新合集' : '创建合集'}</Button>
                             </FormItem>
                         </Form>
                     </TabPane>
@@ -595,28 +565,74 @@ class CreateProductForm extends React.Component {
                             <Pagination defaultCurrent={1} total={goodTotalPage*10} onChange={this.handleChangePageGood.bind(this)}/>
                         }
 
-                        <Modal title={<span>参与该商品众筹的用户<Tag color="red">点击用户查看详细信息</Tag></span>} visible={isShowFunder}
+                        <Modal title={<span>参与该商品众筹的用户<Tag color="red">点击用户头像查看详细信息</Tag></span>} visible={isShowFunder}
                                onOk={()=>{disPatchFetchFn({type:9,isShowFunder:false})}}
                                onCancel={()=>{disPatchFetchFn({type:9,isShowFunder:false})}}
                         >
                             { goodFunderList.length>0 &&
                                 goodFunderList.map((funder,index)=>{
                                     return(
-                                        <p key={index}>
-                                            {funder.name}
-                                        </p>
+                                        <div className="funder">
+                                            <Dropdown
+                                                overlay={
+                                                    <Menu key={index}>
+                                                        {
+                                                            funder.userFundModels.map((user, index)=> {
+                                                                return (
+                                                                    <Menu.Item key={index}>
+                                                                        <Row gutter={20}>
+                                                                            <Col className="gutter-row" span={4}>
+                                                                                <span>
+                                                                                    <img className="headPic" role="presentation" src={user.userModel.headPic}/>
+                                                                                </span>
+                                                                            </Col>
+                                                                            <Col className="gutter-row" span={10}>
+                                                                               <Tag color="cyan">姓名: {user.userModel.userName}</Tag>
+                                                                            </Col>
+                                                                            <Col className="gutter-row" span={8}>
+                                                                                <Tag color="orange">价格: ￥ { user.price}</Tag>
+                                                                            </Col>
+                                                                            <Col className="gutter-row" span={4}>
+                                                                                <Tag color="#2db7f5">退款: { user.status===0?'未退款':
+                                                                                (user.status===1?'退款中':'已退款')}</Tag>
+                                                                            </Col>
+                                                                        </Row>
+                                                                    </Menu.Item>
+                                                                )
+                                                            })
+                                                        }
+                                                    </Menu>
+                                                }
+                                                trigger={['click']}
+                                            >
+                                                    <span className="ant-dropdown-link">
+                                                        <img className="headPic" role="presentation" src={funder.headPic}/>
+                                                    </span>
+                                            </Dropdown>
+                                            <Tag color="orange">￥ { funder.fundPrice}</Tag>
+                                            { funder.status === 1 &&
+                                                 <Tag color="green-inverse">成功</Tag>
+                                            }
+                                            { funder.status === 1 &&
+                                                <div>
+                                                   <p>姓名:  { funder.userModel.userName}</p>
+                                                    <p>地址: { funder.userModel.address}</p>
+                                                    <p> 电话:  { funder.userModel.phone}</p>
+                                                </div>
+                                            }
+                                        </div>
                                     )
                                 })
                             }
                             { goodFunderList.length===0 &&
-                                <span><Icon type="frown-o" /> 暂无众筹人数</span>
+                            <span><Icon type="frown-o" /> 暂无众筹人数</span>
                             }
                         </Modal>
 
                     </TabPane>
 
                     {/*创建某商品集合下的新产品*/}
-                    <TabPane tab={<span>创建新商品集合{ editId ? <Tag color="red">众筹编辑中...</Tag>:''}</span>} key="4">
+                    <TabPane tab={<span>创建新众筹{ editId ? <Tag color="red">众筹编辑中...</Tag>:''}</span>} key="4">
                         <Button type="primary" icon="arrow-left" onClick={this.handleClickTab.bind(this, 3)}>返回</Button>
                         <Form onSubmit={this.handleGoodInfoSubmit}>
                             <FormItem
@@ -738,13 +754,54 @@ class CreateProductForm extends React.Component {
                                 )}
                             </FormItem>
 
+                            <FormItem
+                                {...formItemLayout}
+                                label={(
+                                    <span>
+                                      请填写场景&nbsp;
+                                      <Tooltip title="请填写场景">
+                                        <Icon type="info-circle-o" />
+                                      </Tooltip>
+                                    </span>
+                                )}
+                                hasFeedback
+                            >
+                                { getFieldDecorator('goodPlace', {
+                                    initialValue: editId ? goodPlace : '',
+                                    rules: [{
+                                        required: folderId,
+                                        message: '请填写场景',
+                                    }],
+                                })(
+                                    <Input  type="textarea" rows={2} />
+                                )}
+                            </FormItem>
 
                             <FormItem
                                 {...formItemLayout}
                                 label={(
                                     <span>
-                                      上传图片&nbsp;
-                                      <Tooltip title="请上传商品集合的图片">
+                                      上传logo图片&nbsp;
+                                      <Tooltip title="请上传众筹商品logo图片">
+                                       <Icon type="file-jpg" />
+                                      </Tooltip>
+                                    </span>
+                                )}
+                                hasFeedback
+                            >
+                                <Upload {...this.state.logoPicPropssss} className="upload-list-inline">
+                                    <Button>
+                                        <Icon type="upload" /> 请上传商品logo
+                                    </Button>
+                                </Upload>
+                            </FormItem>
+
+                            <FormItem
+                                {...formItemLayout}
+                                label={(
+                                    <span>
+                                      上传详情大图片&nbsp;
+                                      <Tooltip title="请上传商品的详情大图片">
                                        <Icon type="file-jpg" />
                                       </Tooltip>
                                     </span>
@@ -757,8 +814,16 @@ class CreateProductForm extends React.Component {
                                     </Button>
                                 </Upload>
                             </FormItem>
+
                             <FormItem {...tailFormItemLayout}>
-                                <Button type="primary" htmlType="submit" size="large">{editId ? '更新众筹' : '创建众筹'}</Button>
+                                <Button
+                                    loading={isButtonLock}
+                                    type="primary"
+                                    htmlType="submit"
+                                    size="large"
+                                >
+                                    {editId ? '更新众筹' : '创建众筹'}
+                                </Button>
                             </FormItem>
                         </Form>
                     </TabPane>
@@ -782,6 +847,7 @@ function mapStateToProps (state) {
 
         isLoading: state.productReducer.isLoading,
         isShowError: state.productReducer.isShowError,
+        isButtonLock: state.productReducer.isButtonLock,
 
         folderId: state.productReducer.good.folderId,
         goodList: state.productReducer.good.goodList,
@@ -795,7 +861,9 @@ function mapStateToProps (state) {
         subtitle: state.productReducer.good.info.subtitle, //*
         detail: state.productReducer.good.info.detail, //*
         price: state.productReducer.good.info.price, //*
-        sum: state.productReducer.good.info.sum //*
+        sum: state.productReducer.good.info.sum, //*
+        logoPic: state.productReducer.good.logoPic,
+        goodPlace:  state.productReducer.good.info.goodPlace
     }
 }
 
@@ -804,6 +872,6 @@ export default connect(
     {
         disPatchFetchFn,
         cleanFormData, changeStartTime, changePic ,changeTab,
-        setFolderId, changeEditState
+        setFolderId, changeEditState, changeLogoPic, lockBtn
     }
 )(Home);

@@ -272,7 +272,9 @@ const editInfo =obj=>{
         subtitle: obj.data.subtitle,
         detail: obj.data.detail,
         price: obj.data.price,
-        sum: obj.data.sum
+        sum: obj.data.sum,
+        place: obj.data.place,
+        logoPic: obj.data.logoPic
     };
     return dispatch =>{
         return fetch( url , {

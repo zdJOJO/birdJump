@@ -157,8 +157,10 @@ export default function productReducer( state=initialState ,action) {
                             subtitle: action.obj.subtitle,
                             detail: action.obj.detail,
                             price: action.obj.price,
-                            sum: action.obj.sum
-                        }
+                            sum: action.obj.sum,
+                            goodPlace: action.obj.place
+                        },
+                        logoPic: action.obj.logoPic
                     }
                 }
             }else {

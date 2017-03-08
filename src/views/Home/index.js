@@ -395,9 +395,6 @@ class CreateProductForm extends React.Component {
                     data.id = editId ;
                 }
 
-                console.log(111111111111111111111111)
-                console.log(data)
-
                 disPatchFetchFn({
                     type: editId ? 11 : 6 ,
                     data: data

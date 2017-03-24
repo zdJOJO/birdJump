@@ -15,7 +15,6 @@
 Just clone the repo and install the necessary node modules:
 
 ```shell
-$ git clone https://github.com/fireyy/react-antd-admin
 $ cd react-antd-admin
 $ npm install
 $ npm start
@@ -42,6 +41,4 @@ $ npm run demo
 ## Changelog
 
 ### 0.1.2
-
 * 更新依赖组件到最新版本
-* 增加 page2 demo
